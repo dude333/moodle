@@ -1,6 +1,7 @@
 package moodle
 
 import (
+	"crypto/tls"
 	"errors"
 	"io/ioutil"
 	"math/rand"
@@ -44,6 +45,8 @@ func (d *DefaultLookupUrl) GetUrl(url string) (string, int, string, error) {
 			Timeout: 8 * time.Second,
 		}).Dial,
 		TLSHandshakeTimeout: 8 * time.Second,
+		// For debug only! Won't check the ssl certificates
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 
 	if cookieJar == nil {
