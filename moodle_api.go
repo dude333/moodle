@@ -74,16 +74,44 @@ func (m *MoodleApi) SetSmtpSettings(host string, port int, user, password string
 	m.smtpFromEmail = fromEmail
 }
 
+///////////////////
+type Overviewfiles struct {
+	Filename     string `json:"filename"`
+	Filepath     string `json:"filepath"`
+	Filesize     int    `json:"filesize"`
+	Fileurl      string `json:"fileurl"`
+	Timemodified int    `json:"timemodified"`
+	Mimetype     string `json:"mimetype"`
+}
+type Courses struct {
+	ID                int             `json:"id,omitempty"`
+	Fullname          string          `json:"fullname,omitempty"`
+	Displayname       string          `json:"displayname,omitempty"`
+	Shortname         string          `json:"shortname,omitempty"`
+	Categoryid        int             `json:"categoryid,omitempty"`
+	Categoryname      string          `json:"categoryname,omitempty"`
+	Sortorder         int             `json:"sortorder,omitempty"`
+	Summary           string          `json:"summary,omitempty"`
+	Summaryformat     int             `json:"summaryformat,omitempty"`
+	Summaryfiles      []interface{}   `json:"summaryfiles,omitempty"`
+	OverviewFiles     []Overviewfiles `json:"overviewfiles,omitempty"`
+	Contacts          []interface{}   `json:"contacts,omitempty"`
+	Enrollmentmethods []string        `json:"enrollmentmethods,omitempty"`
+}
+
+//////////////////
+
 type Course struct {
-	MoodleId    int64         `json:"id,omitempty"`
-	Code        string        `json:"shortname,omitempty"`
-	Name        string        `json:"fullname,omitempty"`
-	Summary     string        `json:",omitempty"`
-	Assignments []*Assignment `json:",omitempty"`
-	Roles       []*Role       `json:",omitempty"`
-	Created     *time.Time    `json:"-"`
-	Start       *time.Time    `json:",omitempty"`
-	End         *time.Time    `json:",omitempty"`
+	MoodleId      int64           `json:"id,omitempty"`
+	Code          string          `json:"shortname,omitempty"`
+	Name          string          `json:"fullname,omitempty"`
+	Summary       string          `json:"summary,omitempty"`
+	OverviewFiles []Overviewfiles `json:"overviewfiles,omitempty"`
+	Assignments   []*Assignment   `json:",omitempty"`
+	Roles         []*Role         `json:",omitempty"`
+	Created       *time.Time      `json:"-"`
+	Start         *time.Time      `json:",omitempty"`
+	End           *time.Time      `json:",omitempty"`
 }
 
 type Person struct {
@@ -1172,11 +1200,13 @@ func (m *MoodleApi) GetCourses(value string) (*[]Course, error) {
 	}
 
 	type Result struct {
-		Id          int64  `json:"id"`
-		Code        string `json:"shortname"`
-		Name        string `json:"fullname"`
-		DisplayName string `json:"displayname"`
-		CategoryId  int64  `json:"categoryid"`
+		Id            int64           `json:"id"`
+		Code          string          `json:"shortname"`
+		Name          string          `json:"fullname"`
+		DisplayName   string          `json:"displayname"`
+		CategoryId    int64           `json:"categoryid"`
+		Summary       string          `json:summary`
+		OverviewFiles []Overviewfiles `json:"overviewfiles,omitempty"`
 	}
 	type Results struct {
 		Courses []Result `json:"courses"`
@@ -1191,7 +1221,7 @@ func (m *MoodleApi) GetCourses(value string) (*[]Course, error) {
 
 	subjects := make([]Course, 0, len(results.Courses))
 	for _, i := range results.Courses {
-		subjects = append(subjects, Course{MoodleId: i.Id, Code: i.Code, Name: i.Name})
+		subjects = append(subjects, Course{MoodleId: i.Id, Code: i.Code, Name: i.Name, Summary: i.Summary, OverviewFiles: i.OverviewFiles})
 	}
 	sort.Sort(ByCourseCode(subjects))
 
