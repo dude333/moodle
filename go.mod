@@ -1,1 +1,1 @@
-module github.com/zaddok/moodle
+module github.com/dude333/moodle
